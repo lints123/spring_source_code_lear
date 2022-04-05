@@ -12,22 +12,23 @@ import com.learn.springframework.core.io.Resource;
 import com.learn.springframework.core.io.ResourceLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Struct;
 
 /**
  * @author lints
- * @Date 2022/2/18
- * @Descirption 核心功能，对XML文件进行解析
+ * @Date 2022/4/1
+ * @Descirption
  */
 public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry) {
         super(registry);
     }
-
 
     public XmlBeanDefinitionReader(BeanDefinitionRegistry registry, ResourceLoader resourceLoader) {
         super(registry, resourceLoader);
@@ -51,12 +52,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         }
     }
 
-    /**
-     * 加载
-     *
-     * @param location
-     * @throws BeansException
-     */
+    // 根据加载BeanDefinition
     @Override
     public void loadBeanDefinitions(String location) throws BeansException {
         ResourceLoader resourceLoader = getResourceLoader();
@@ -64,8 +60,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         loadBeanDefinitions(resource);
     }
 
+    @Override
+    public void loadBeanDefinitions(String... locations) throws BeansException {
+        for (String location : locations) {
+            ResourceLoader resourceLoader = getResourceLoader();
+            Resource resource = resourceLoader.getResource(location);
+            loadBeanDefinitions(resource);
+        }
+    }
+
+
     /**
-     * 加载XML配置文件，解析信息，保存到BeanDefinition中
+     * 加载Xml配置文件，解析Xml配置，加载到BeanDefinition中
      *
      * @param inputStream
      * @throws ClassNotFoundException
@@ -75,6 +81,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         Document doc = XmlUtil.readXML(inputStream);
         Element root = doc.getDocumentElement();
 
+        // 解析XML
         // 获取子节点
         NodeList childNodes = root.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
@@ -82,6 +89,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             if (!(childNodes.item(i) instanceof Element)) {
                 continue;
             }
+
             // 判断对象
             if (!"bean".equals(childNodes.item(i).getNodeName())) {
                 continue;
@@ -93,44 +101,54 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             String name = bean.getAttribute("name");
             String className = bean.getAttribute("class");
 
+            //返回class对象的引用。
             Class<?> clazz = Class.forName(className);
-            // 优先级 id > name
+
             String beanName = StrUtil.isNotEmpty(id) ? id : name;
             if (StrUtil.isEmpty(beanName)) {
                 beanName = StrUtil.lowerFirst(clazz.getSimpleName());
             }
 
-            // 定义Bean
+            // 加载BeanDefinition
             BeanDefinition beanDefinition = new BeanDefinition(clazz);
-            // 读取属性并且填充
+
+            // 是否存在属性
             for (int j = 0; j < bean.getChildNodes().getLength(); j++) {
+
+                // 是否是节点
                 if (!(bean.getChildNodes().item(j) instanceof Element)) {
                     continue;
                 }
-                // 解析属性
+
+                // 是否为属性
                 if (!"property".equals(bean.getChildNodes().item(j).getNodeName())) {
                     continue;
                 }
-
-                // 解析标签 property
+                // TODO 第二次犯错，获取属性，这里之前写 i , 直接获取到首个节点，也就是Bean上面去了。
+                // TODO 错误案例：(Element) bean.getChildNodes().item(i);
                 Element property = (Element) bean.getChildNodes().item(j);
                 String attrName = property.getAttribute("name");
                 String attrValue = property.getAttribute("value");
                 String attrRef = property.getAttribute("ref");
-                // 获取属性值、引入对象、值对象
+
+                // 可能为值也可能为对象
                 Object value = StrUtil.isNotEmpty(attrRef) ? new BeanReference(attrRef) : attrValue;
 
-                // 创建属性信息
+                // 保存属性
                 PropertyValue propertyValue = new PropertyValue(attrName, value);
                 beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
             }
+            // 校验是否存在
             if (getRegistry().containsBeanDefinition(beanName)) {
                 throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed");
             }
-            // 注册BeanDefnition
+
+            // 注册BeanDefinition
             getRegistry().registerBeanDefinition(beanName, beanDefinition);
 
         }
 
     }
+
+
 }
