@@ -12,4 +12,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory,Singlet
     String SCOPE_SINGLETON = "singleton";
 
     String SCOPE_PROTOTYPE = "prototype";
+
+    void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
+
 }

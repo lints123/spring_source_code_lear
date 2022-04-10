@@ -5,6 +5,7 @@ import com.learn.springframework.beans.factory.BeanFactory;
 import com.learn.springframework.beans.factory.ConfigurableListableBeanFactory;
 import com.learn.springframework.beans.factory.config.BeanDefinition;
 import com.learn.springframework.beans.factory.config.BeanPostProcessor;
+import com.learn.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 import java.beans.Beans;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
  * @Date 2022/3/27
  * @Descirption BeanDefinition注册表接口
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableListableBeanFactory {
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
 
     /** BeanPostProcessors to apply in createBean */
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();

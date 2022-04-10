@@ -87,6 +87,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         this.instantiationStrategy = instantiationStrategy;
     }
 
+    // 后置处理器处理
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
         // 1. 执行BeanPostProcessor Before处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
