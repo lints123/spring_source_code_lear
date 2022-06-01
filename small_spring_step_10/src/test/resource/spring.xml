@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+
+<!--    <bean id="userService" class="com.learn.springframework.test09.bean.UserService" scope="prototype">-->
+<!--    <bean id="userService" class="com.learn.springframework.test10.bean.UserService" scope="prototype">-->
+<!--        <property name="uId" value="10001"></property>-->
+<!--        <property name="company" value="腾讯"></property>-->
+<!--        <property name="location" value="深圳"></property>-->
+<!--        <property name="userDao" ref="proxyUserDao"></property>-->
+<!--    </bean>-->
+
+<!--    <bean id = "proxyUserDao" class="com.learn.springframework.test10.bean.ProxyBeanFactory"/>-->
+
+    <bean class="com.learn.springframework.test10.event.ContextClosedEventListener"/>
+    <bean class="com.learn.springframework.test10.event.ContextRefreshEventListener"/>
+    <bean class="com.learn.springframework.test10.event.CustomEventListener"/>
+
+</beans>

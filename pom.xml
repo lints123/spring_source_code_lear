@@ -17,6 +17,7 @@
       <module>small_spring_step_07</module>
       <module>small_spring_step_08</module>
       <module>small_spring_step_09</module>
+    <module>small_spring_step_10</module>
   </modules>
   <packaging>pom</packaging>
 
